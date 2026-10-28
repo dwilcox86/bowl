@@ -15,4 +15,6 @@ Live at https://bowl.duncanwilcox.com.au
 No build step. Cloudflare Pages: build command blank, output directory `/`.
 
 ## Adding recipes
-Copy an entry in `CUISINES`. Each cuisine needs at least 5 toppings in `veg`. Ingredient strings are `"qty unit|name|aisle"` for 2 serves; aisles are P fruit & veg, M butcher, E fridge, R rice & grains, I specialty, S pantry. `{s}` pluralises counted items. Textures (`t`): strip, leaf, chunk, meat, cube, dot, slice, shred, sprout, mush, curl, mash.
+Copy an entry in `CUISINES`. Each cuisine needs at least 5 toppings in `veg`. Ingredient strings are `"qty unit|name|aisle"` for 2 serves; aisles are P fruit & veg, M butcher, E fridge, R rice & grains, I specialty, S pantry. `{s}` pluralises counted items; `{f/ves}` gives singular/plural endings. Textures (`t`): strip, leaf, chunk, meat, cube, dot, slice, shred, sprout, mush, curl, mash.
+
+Each cuisine also has `styles`: how the protein is seasoned and cooked (e.g. Thai: lemongrass, red curry, green curry, satay, larb, garlic pepper, krapow). The protein segment's colour comes from the style's `glaze`.

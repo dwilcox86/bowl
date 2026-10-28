@@ -20,7 +20,8 @@ const kindOf = slot => slot === 'base' ? 'base' : slot === 'centre' ? 'centre' :
 /* ---------- state ---------- */
 const st = { cuisine: 'korean', protein: 'beef', serves: 2, bowl: null, locks: new Set(), active: null, mixed: false, checked: new Set(), done: new Set(), fresh: new Set() };
 const cur = () => CUISINES.find(c => c.id === st.cuisine);
-function proteinOpt(key = st.protein) { const C = cur(), P = PROTEINS[key]; return { id: `${C.id}-protein-${key}`, n: `${C.style} ${P.w}`, c: mixHex(P.c, C.glaze, .3), t: P.t, protein: true }; }
+const styleOf = (i = st.bowl.style) => cur().styles[i] || cur().styles[0];
+function proteinOpt(key = st.protein, si = st.bowl.style) { const C = cur(), P = PROTEINS[key], S = styleOf(si); return { id: `${C.id}-protein-${key}-${S.id}`, n: `${S.n} ${P.w}`, c: mixHex(P.c, S.glaze, .32), t: P.t, protein: true }; }
 function slotOpt(slot) {
   const C = cur(), b = st.bowl;
   if (slot === 'protein') return proteinOpt();
@@ -37,28 +38,31 @@ function setSlot(slot, v) {
   else st.bowl[slot] = +v;
   st.fresh.add(slot);
 }
-function randomise(slot) { const opts = choices(slot).filter(v => v !== curVal(slot) && !usedElsewhere(slot, v)); if (opts.length) setSlot(slot, pick(opts)); }
+function randomise(slot) {
+  if (slot === 'protein') { const n = cur().styles.length, opts = [...Array(n).keys()].filter(i => i !== st.bowl.style); st.bowl.style = pick(opts); st.fresh.add('protein'); return; }
+  const opts = choices(slot).filter(v => v !== curVal(slot) && !usedElsewhere(slot, v)); if (opts.length) setSlot(slot, pick(opts)); }
 function newBowl(keep) {
   const C = cur(), old = st.bowl, L = keep ? st.locks : new Set();
   const lockedVeg = old ? old.veg.filter((_, i) => L.has('veg' + i)) : [];
   const pool = shuffled(C.veg.map((_, i) => i).filter(i => !lockedVeg.includes(i)));
   const veg = Array.from({ length: VEG }, (_, i) => L.has('veg' + i) && old ? old.veg[i] : pool.pop());
   const one = k => L.has(k) && old ? old[k] : rint(C[k].length);
-  return { base: one('base'), veg, centre: one('centre'), sauce: one('sauce'), garnish: one('garnish') };
+  const style = L.has('protein') && old ? old.style : rint(C.styles.length);
+  return { style, base: one('base'), veg, centre: one('centre'), sauce: one('sauce'), garnish: one('garnish') };
 }
 function bowlState() { const C = cur(), b = st.bowl; return { base: C.base[b.base], wedges: [proteinOpt(), ...b.veg.map(v => C.veg[v])], centre: C.centre[b.centre], sauce: C.sauce[b.sauce], garnish: C.garnish[b.garnish] }; }
-function combos(C) { return C.base.length * choose(C.veg.length, VEG) * C.centre.length * C.sauce.length * C.garnish.length * Object.keys(PROTEINS).length; }
+function combos(C) { return C.base.length * choose(C.veg.length, VEG) * C.centre.length * C.sauce.length * C.garnish.length * C.styles.length * Object.keys(PROTEINS).length; }
 
 /* ---------- link state ---------- */
 function writeHash() {
-  const b = st.bowl, q = new URLSearchParams({ c: st.cuisine, p: st.protein, b: b.base, v: b.veg.join('.'), e: b.centre, s: b.sauce, g: b.garnish, n: st.serves });
+  const b = st.bowl, q = new URLSearchParams({ c: st.cuisine, p: st.protein, m: b.style, b: b.base, v: b.veg.join('.'), e: b.centre, s: b.sauce, g: b.garnish, n: st.serves });
   try { history.replaceState(null, '', '#' + q.toString()); } catch (e) { /* sandboxed preview */ }
 }
 function readHash() {
   try {
     const q = new URLSearchParams(location.hash.slice(1)); const C = CUISINES.find(c => c.id === q.get('c')); if (!C) return false;
     const ok = (v, n) => Number.isInteger(v) && v >= 0 && v < n;
-    const veg = (q.get('v') || '').split('.').map(Number), b = { base: +q.get('b'), veg, centre: +q.get('e'), sauce: +q.get('s'), garnish: +q.get('g') };
+    const veg = (q.get('v') || '').split('.').map(Number), m = +(q.get('m') || 0), b = { style: ok(m, C.styles.length) ? m : 0, base: +q.get('b'), veg, centre: +q.get('e'), sauce: +q.get('s'), garnish: +q.get('g') };
     if (!ok(b.base, C.base.length) || !ok(b.centre, C.centre.length) || !ok(b.sauce, C.sauce.length) || !ok(b.garnish, C.garnish.length)) return false;
     if (veg.length !== VEG || new Set(veg).size !== VEG || !veg.every(v => ok(v, C.veg.length))) return false;
     st.cuisine = C.id; st.bowl = b; if (PROTEINS[q.get('p')]) st.protein = q.get('p');
@@ -68,7 +72,7 @@ function readHash() {
 }
 
 /* ---------- shopping and method ---------- */
-const PLURAL = { cup: 'cups', can: 'cans', bunch: 'bunches', jar: 'jars' }, FR = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
+const PLURAL = { cup: 'cups', can: 'cans', bunch: 'bunches', jar: 'jars', pinch: 'pinches', pack: 'packs' }, FR = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
 function parseItem(s) { const [q, name, a] = s.split('|'); const p = q.trim().split(/\s+/); return { qty: parseFloat(p[0]), unit: p[1] || '', name, a }; }
 function fmtQty(q, u) {
   if (u === 'g' || u === 'ml') { const r = q >= 100 ? Math.round(q / 10) * 10 : Math.max(5, Math.round(q / 5) * 5); return r + ' ' + u; }
@@ -76,19 +80,19 @@ function fmtQty(q, u) {
   const w = Math.floor(v), fr = +(v - w).toFixed(2);
   return (w || '') + (FR[fr] || '') + (u ? ' ' + (v > 1 && PLURAL[u] ? PLURAL[u] : u) : '');
 }
-const fmtName = (name, q, u) => name.replace(/\{(\w+)\}/g, (_, s) => !u && q > 1 ? s : '');
+const fmtName = (name, q, u) => name.replace(/\{([^}]*)\}/g, (_, s) => { const many = !u && q > 1, [one, more] = s.includes('/') ? s.split('/') : ['', s]; return many ? more : one; });
 function gather() {
   const C = cur(), b = st.bowl, P = PROTEINS[st.protein];
-  const src = [...C.base[b.base].i, ...P.i, ...C.mar.i, ...b.veg.flatMap(v => C.veg[v].i), ...C.centre[b.centre].i, ...C.sauce[b.sauce].i, ...C.garnish[b.garnish].i];
+  const src = [...C.base[b.base].i, ...P.i, ...styleOf().i, ...b.veg.flatMap(v => C.veg[v].i), ...C.centre[b.centre].i, ...C.sauce[b.sauce].i, ...C.garnish[b.garnish].i];
   const map = new Map(); for (const s of src) { const it = parseItem(s), k = it.name + '|' + it.unit, e = map.get(k); if (e) e.qty += it.qty; else map.set(k, { ...it, key: k }); }
   const f = st.serves / 2; return [...map.values()].map(it => { const q = it.qty * f; return { ...it, q, label: fmtQty(q, it.unit), nm: fmtName(it.name, q, it.unit) }; });
 }
 function steps() {
-  const C = cur(), b = st.bowl, P = PROTEINS[st.protein];
+  const C = cur(), b = st.bowl, P = PROTEINS[st.protein], S = styleOf();
   const base = C.base[b.base], cen = C.centre[b.centre], sau = C.sauce[b.sauce], gar = C.garnish[b.garnish];
   return [
     [`Start the ${lc(base.n)}`, base.p],
-    [`Make the ${lc(C.style)} marinade`, `${C.mar.how} ${P.cut} ${P.plant ? 'Keep the marinade aside for the end.' : `Toss the ${P.w} through it and leave it while you prep everything else.`}`],
+    [S.step || `Make the ${lc(S.n)} marinade`, `${S.how} ${P.cut} ${P.plant ? 'Keep the marinade aside for the end.' : `Toss the ${P.w} through it and leave it while you prep everything else.`}`],
     [`Mix the ${lc(sau.n)}`, sau.p],
     ['Prep the toppings', null, b.veg.map(v => C.veg[v])],
     [`Cook the ${P.w}`, P.cook + (P.plant ? ' Pour in the marinade for the last minute and toss until sticky and glazed.' : '')],
@@ -110,7 +114,7 @@ function renderPickers() {
 }
 function renderRows() {
   $('#rows').innerHTML = SLOTS.map(slot => {
-    const o = slotOpt(slot), lockable = slot !== 'protein', locked = st.locks.has(slot);
+    const o = slotOpt(slot), lockable = true, locked = st.locks.has(slot);
     return `<li class="${st.active === slot ? 'on' : ''} ${st.fresh.has(slot) ? 'fresh' : ''}" data-row="${slot}">
       <button type="button" class="row-open" data-open="${slot}" title="${esc(o.id)}"><img src="${thumb(kindOf(slot), o)}" alt=""><span><span class="cat">${catOf(slot)}</span><span class="nm">${esc(o.n)}</span></span></button>
       ${lockable ? `<button type="button" class="mini lock" data-lock="${slot}" aria-pressed="${locked}" aria-label="${locked ? 'Unlock' : 'Keep'} ${esc(o.n)} when shuffling">${LOCK}</button>` : '<span class="mini spacer"></span>'}
@@ -140,13 +144,13 @@ function renderSteps() {
 function renderHead() {
   const C = cur(), P = PROTEINS[st.protein];
   $('#eyebrow').textContent = `${C.n} · ${C.sub}`;
-  $('#title').textContent = `${C.style} ${P.w} bibimbap`;
+  $('#title').textContent = `${styleOf().n} ${P.w} bibimbap`;
   $('#odds').innerHTML = `One of <b>${combos(C).toLocaleString('en-AU')}</b> ${esc(C.n === 'Traditional' ? 'traditional' : C.n)} bowls`;
-  document.title = `${C.style} ${P.w} bibimbap · Bibimbap Builder`;
+  document.title = `${styleOf().n} ${P.w} bibimbap · Bibimbap Builder`;
 }
 function render({ shuffle = false } = {}) {
   document.querySelectorAll('[data-cuisine]').forEach(b => b.setAttribute('aria-checked', b.dataset.cuisine === st.cuisine));
-  document.querySelectorAll('[data-protein]').forEach(b => b.setAttribute('aria-checked', b.dataset.protein === st.protein));
+  document.querySelectorAll('[data-protein]').forEach(b => { b.setAttribute('aria-checked', b.dataset.protein === st.protein); b.querySelector('img').src = thumb('wedge', proteinOpt(b.dataset.protein)); });
   renderHead(); renderRows(); renderShop(); renderSteps();
   bowl.update(bowlState(), { shuffle });
   bowl.setActive(st.active);
@@ -163,13 +167,14 @@ function fillSheet(slot) {
   $('#sheetThumb').src = thumb(kindOf(slot), o);
   $('#sheetCat').textContent = catOf(slot);
   $('#sheetName').textContent = o.n;
-  $('#sheetPrep').textContent = slot === 'protein' ? PROTEINS[st.protein].cut : o.p;
-  $('#sheetAlts').innerHTML = choices(slot).sort((a, b) => usedElsewhere(slot, a) - usedElsewhere(slot, b)).map(v => {
+  $('#sheetPrep').textContent = slot === 'protein' ? styleOf().how : o.p;
+  const styleGroup = slot === 'protein' ? `<p class="lbl">Style</p><div class="alts">${cur().styles.map((S, i) => `<button type="button" class="alt" data-pick-style="${i}" aria-pressed="${i === st.bowl.style}"><img src="${thumb('wedge', proteinOpt(st.protein, i))}" alt="">${esc(S.n)}</button>`).join('')}</div>` : '';
+  $('#sheetAlts').innerHTML = styleGroup + `<p class="lbl">${slot === 'protein' ? 'Protein' : 'Swap for'}</p><div class="alts">` + choices(slot).sort((a, b) => usedElsewhere(slot, a) - usedElsewhere(slot, b)).map(v => {
     const opt = optFor(slot, v), sel = v === curVal(slot), used = usedElsewhere(slot, v), label = slot === 'protein' ? PROTEINS[v].n : opt.n;
     return `<button type="button" class="alt" data-pick="${v}" aria-pressed="${sel}" ${used ? 'disabled' : ''}><img src="${thumb(kindOf(slot), opt)}" alt="">${esc(label)}${used ? '<small>in the bowl</small>' : ''}</button>`;
-  }).join('');
-  const lock = $('#sheetLock'); lock.hidden = slot === 'protein'; lock.setAttribute('aria-pressed', locked);
-  lock.querySelector('span').textContent = locked ? 'Kept when shuffling' : 'Keep when shuffling';
+  }).join('') + '</div>';
+  const lock = $('#sheetLock'); lock.setAttribute('aria-pressed', locked);
+  lock.querySelector('span').textContent = (locked ? 'Kept' : 'Keep') + (slot === 'protein' ? ' this style' : '') + ' when shuffling';
 }
 function placeSheet(slot) {
   if (narrow()) { sheet.style.left = sheet.style.top = ''; return; }
@@ -235,6 +240,7 @@ document.addEventListener('click', e => {
   else if (d.open) { if (st.mixed) setMixed(false); openSheet(d.open, t); }
   else if (d.rand) { if (st.mixed) setMixed(false); randomise(d.rand); render(); }
   else if (d.lock) { st.locks.has(d.lock) ? st.locks.delete(d.lock) : st.locks.add(d.lock); renderRows(); if (st.active === d.lock) fillSheet(d.lock); }
+  else if (d.pickStyle !== undefined) { st.bowl.style = +d.pickStyle; st.fresh.add('protein'); render(); }
   else if (d.pick !== undefined && st.active) { const slot = st.active; setSlot(slot, slot === 'protein' ? d.pick : +d.pick); render(); }
   else if (d.step !== undefined) { const i = +d.step; st.done.has(i) ? st.done.delete(i) : st.done.add(i); renderSteps(); }
 });
@@ -266,6 +272,6 @@ $('#share').addEventListener('click', async () => {
 window.addEventListener('hashchange', () => { if (readHash()) { renderPickers(); render(); } });
 
 /* ---------- start ---------- */
-if (!readHash()) st.bowl = { base: 0, veg: [0, 1, 2, 5, 4], centre: 0, sauce: 0, garnish: 0 };
+if (!readHash()) st.bowl = { style: 0, base: 0, veg: [0, 1, 2, 5, 4], centre: 0, sauce: 0, garnish: 0 };
 renderPickers();
 render({ shuffle: true });

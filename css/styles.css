@@ -46,7 +46,7 @@ svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; 
 
 /* pickers */
 .pickers { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
-.cuisines { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px }
+.cuisines { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 8px }
 .cuisine { position: relative; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 10px 12px 11px; cursor: pointer;
   display: flex; flex-direction: column; gap: 6px; min-width: 0; transition: border-color .15s, transform .15s, box-shadow .15s }
 .cuisine:hover { border-color: var(--muted); transform: translateY(-1px) }
@@ -111,7 +111,9 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clam
 .icon svg { width: 16px; height: 16px }
 .icon:hover { border-color: var(--ink) }
 .sheet-prep { margin: 10px 0 12px; color: var(--muted); font-size: .9rem }
-.alts { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 8px; max-height: 260px; overflow-y: auto; padding: 2px }
+.alt-groups { max-height: 340px; overflow-y: auto; padding: 2px; display: flex; flex-direction: column; gap: 6px }
+.alt-groups .lbl { margin: 6px 0 0 }
+.alts { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 8px }
 .alt { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px 9px; border: 1px solid var(--line); background: var(--paper); border-radius: 14px; cursor: pointer; font-size: .8rem; line-height: 1.2; text-align: center; transition: border-color .15s, transform .15s }
 .alt img { width: 52px; height: 52px; border-radius: 50%; box-shadow: 0 3px 8px rgba(0,0,0,.22); transition: transform .2s }
 .alt:hover:not(:disabled) { border-color: var(--ink) }
@@ -187,7 +189,6 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clam
 .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 9px 18px; border-radius: 999px; z-index: 60; font-size: .9rem; animation: rise .2s ease; box-shadow: 0 10px 30px rgba(0,0,0,.3) }
 
 /* responsive */
-@media (max-width: 1180px) { .cuisines { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 @media (max-width: 980px) {
   .layout { grid-template-columns: minmax(0, 1fr) }
   .panel { position: static; max-height: none }
@@ -204,7 +205,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clam
   .hint { flex-basis: 100%; margin: 0 }
   .sheet { position: fixed; left: 0 !important; right: 0; top: auto !important; bottom: 0; width: auto; border-radius: 22px 22px 0 0; z-index: 50;
     padding: 18px max(16px, env(safe-area-inset-right, 0px)) max(18px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); max-height: 82vh; overflow-y: auto }
-  .alts { max-height: none; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)) }
+  .alt-groups { max-height: none }
+  .alts { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)) }
   .hangul { display: none }
   .share span { display: none }
   .share { margin-left: auto }
