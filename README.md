@@ -8,8 +8,8 @@ Live at https://bowl.duncanwilcox.com.au
 - `index.html` – app shell
 - `css/styles.css` – styles (light and dark)
 - `js/data.js` – cuisines, proteins, ingredients, photo manifest
-- `js/bowl.js` – canvas renderer: shaded ingredient sprites, rice bed, stone bowl, animations, thumbnails
-- `js/app.js` – state, swap sheet, locks, shopping list, method, shareable links (`#c=…&p=…`)
+- `js/bowl.js` – canvas renderer: shaded ingredient sprites, rice bed, stone dolsot on a wooden trivet, animations, thumbnails, celadon side dishes and brass cutlery
+- `js/app.js` – state, annotated labels and leader lines, swap card, locks, market list, method, keyboard shortcuts (S shuffle, M mix), shareable links (`#c=…&p=…`)
 - `img/` – optional ingredient photos (see `img/README.md`)
 
 No build step. Cloudflare Pages: build command blank, output directory `/`.

@@ -4,124 +4,141 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bibimbap Builder</title>
-<meta name="description" content="Pick a flavour and a protein, get a randomised bibimbap bowl you can swap segment by segment, with a shopping list and method.">
-<meta name="theme-color" content="#161b19">
+<meta name="description" content="Pick a flavour and a protein, get a randomised bibimbap you can swap segment by segment, with a market list and method.">
+<meta name="theme-color" content="#16110d">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%232b2e2c'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%23f4f1e8'/%3E%3Cpath d='M32 8a24 24 0 0 1 20.8 12L32 32Z' fill='%23c8381f'/%3E%3Cpath d='M52.8 44A24 24 0 0 1 32 56V32Z' fill='%232f6b2f'/%3E%3Cpath d='M11.2 44A24 24 0 0 1 11.2 20L32 32Z' fill='%23e8742a'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23f2a31a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200;300;500;600;700&family=Gothic+A1:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="app">
-  <header class="bar">
-    <a class="brand" href="./" aria-label="Bibimbap Builder home">
-      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#2b2e2c"/><circle cx="32" cy="32" r="24" fill="#f4f1e8"/><path d="M32 8a24 24 0 0 1 20.8 12L32 32Z" fill="#c8381f"/><path d="M52.8 44A24 24 0 0 1 32 56V32Z" fill="#2f6b2f"/><path d="M11.2 44A24 24 0 0 1 11.2 20L32 32Z" fill="#e8742a"/><circle cx="32" cy="32" r="8" fill="#f2a31a"/></svg>
-      <span class="word">Bibimbap <em>Builder</em></span>
-    </a>
-    <p class="hangul" lang="ko">비빔밥 · mixed rice</p>
-    <button class="ghost share" type="button" id="share">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
-      <span>Copy link to this bowl</span>
-    </button>
-  </header>
 
-  <main class="layout">
-    <section class="stage-col" aria-label="Build your bowl">
-      <div class="pickers">
-        <div class="picker">
-          <p class="lbl" id="flavourLbl">Flavour</p>
-          <div class="cuisines" id="cuisines" role="radiogroup" aria-labelledby="flavourLbl"></div>
-        </div>
-        <div class="picker">
-          <p class="lbl" id="proteinLbl">Protein</p>
-          <div class="proteins" id="proteins" role="radiogroup" aria-labelledby="proteinLbl"></div>
-        </div>
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <nav class="topbar" aria-label="Site">
+      <a class="brand" href="./" aria-label="Bibimbap Builder home">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#2b2e2c"/><circle cx="32" cy="32" r="24" fill="#f4f1e8"/><path d="M32 8a24 24 0 0 1 20.8 12L32 32Z" fill="#c8381f"/><path d="M52.8 44A24 24 0 0 1 32 56V32Z" fill="#2f6b2f"/><path d="M11.2 44A24 24 0 0 1 11.2 20L32 32Z" fill="#e8742a"/><circle cx="32" cy="32" r="8" fill="#f2a31a"/></svg>
+        <span>Bibimbap Builder</span>
+      </a>
+      <a class="toplink" href="#recipe">The recipe <span aria-hidden="true">↓</span></a>
+      <button class="toplink" type="button" id="share">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+        <span>Copy link</span>
+      </button>
+    </nav>
+
+    <section class="intro" aria-label="Choose your bowl">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title"><span class="t1"></span><span class="t2">bibimbap</span></h1>
+      <p class="odds">One of <b id="odds">0</b> <span id="oddsCuisine"></span> bowls</p>
+
+      <div class="field">
+        <p class="label" id="flavourLbl">Flavour</p>
+        <div class="menu" id="cuisines" role="radiogroup" aria-labelledby="flavourLbl"></div>
+      </div>
+      <div class="field">
+        <p class="label" id="proteinLbl">Protein</p>
+        <div class="proteins" id="proteins" role="radiogroup" aria-labelledby="proteinLbl"></div>
       </div>
 
-      <div class="stage" id="stage">
-        <div class="stage-head">
-          <p class="eyebrow" id="eyebrow"></p>
-          <h1 id="title"></h1>
-          <p class="odds" id="odds"></p>
-        </div>
-        <div class="bowl-box" id="bowlBox">
-          <canvas id="bowl" aria-label="Your bibimbap, seen from above. Use the list of ingredients to swap segments with a keyboard." role="img"></canvas>
-          <div class="steam" aria-hidden="true"><i></i><i></i><i></i></div>
-          <div class="tip" id="tip" hidden></div>
-        </div>
-        <div class="stage-actions">
-          <button class="btn primary" type="button" id="shuffle">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
-            Shuffle bowl
-          </button>
-          <button class="btn" type="button" id="mix" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/><path d="M21 3l-6 6"/></svg>
-            <span>Mix it</span>
-          </button>
-          <p class="hint" id="hint">Tap any segment to swap it.</p>
-        </div>
-
-        <div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetName" hidden>
-          <div class="sheet-head">
-            <img class="sheet-thumb" id="sheetThumb" alt="">
-            <div class="sheet-title"><p class="cat" id="sheetCat"></p><h2 id="sheetName"></h2></div>
-            <button class="icon" type="button" id="sheetClose" aria-label="Close">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-            </button>
-          </div>
-          <p class="sheet-prep" id="sheetPrep"></p>
-          <div class="alt-groups" id="sheetAlts"></div>
-          <div class="sheet-foot">
-            <button class="btn small" type="button" id="sheetLock" aria-pressed="false">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-              <span>Keep when shuffling</span>
-            </button>
-            <button class="btn small primary" type="button" id="sheetRandom">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
-              Surprise me
-            </button>
-          </div>
-        </div>
+      <div class="dock" id="dock">
+        <button class="shuffle" type="button" id="shuffle" aria-keyshortcuts="s">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/></svg>
+          <span>Shuffle bowl</span><kbd>S</kbd>
+        </button>
+        <button class="mix" type="button" id="mix" aria-pressed="false" aria-keyshortcuts="m">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7a5 5 0 1 0 5 5"/><path d="M21 3l-6 6"/></svg>
+          <span>Mix it</span><kbd>M</kbd>
+        </button>
       </div>
     </section>
 
-    <aside class="panel" aria-label="Recipe">
-      <div class="tabs" role="tablist">
-        <button role="tab" id="tab-bowl" aria-controls="pane-bowl" aria-selected="true" type="button">In the bowl</button>
-        <button role="tab" id="tab-shop" aria-controls="pane-shop" aria-selected="false" type="button">Shopping <span class="count" id="shopCount"></span></button>
-        <button role="tab" id="tab-method" aria-controls="pane-method" aria-selected="false" type="button">Method</button>
+    <section class="plate" id="plate" aria-label="Your bowl">
+      <p class="hangul" lang="ko" aria-hidden="true">비빔밥</p>
+      <div class="still" id="still">
+        <canvas id="bowl" role="img" aria-label="Your bibimbap seen from above. The labels around it swap each part."></canvas>
+        <div class="steam" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       </div>
+      <svg class="leaders" id="leaders" aria-hidden="true"></svg>
+      <ol class="notes" id="notes" aria-label="In the bowl"></ol>
+      <div class="sides" id="sides" aria-label="Rice, centre, sauce and garnish"></div>
+      <p class="hint" id="hint">Tap a segment or a label to swap it</p>
+    </section>
 
-      <section class="pane" id="pane-bowl" role="tabpanel" aria-labelledby="tab-bowl">
-        <ul class="rows" id="rows"></ul>
-      </section>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetName" hidden>
+      <div class="sheet-head">
+        <img class="sheet-thumb" id="sheetThumb" alt="">
+        <div><p class="cat" id="sheetCat"></p><h2 id="sheetName"></h2></div>
+        <button class="icon" type="button" id="sheetClose" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <p class="sheet-prep" id="sheetPrep"></p>
+      <div class="alt-groups" id="sheetAlts"></div>
+      <div class="sheet-foot">
+        <button class="pill" type="button" id="sheetLock" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Keep when shuffling</span>
+        </button>
+        <button class="pill hot" type="button" id="sheetRandom">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          Surprise me
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
 
-      <section class="pane" id="pane-shop" role="tabpanel" aria-labelledby="tab-shop" hidden>
-        <div class="pane-tools">
-          <div class="serves"><span class="lbl" id="servesLbl">Serves</span>
-            <div class="stepper" role="group" aria-labelledby="servesLbl">
-              <button type="button" id="less" aria-label="Fewer serves">−</button>
-              <output id="serves" aria-live="polite">2</output>
-              <button type="button" id="more" aria-label="More serves">+</button>
-            </div>
-          </div>
-          <button class="btn small" type="button" id="copy">Copy list</button>
+<main class="recipe" id="recipe">
+  <div class="recipe-head">
+    <p class="kicker">The recipe</p>
+    <h2 id="recipeTitle"></h2>
+    <div class="serves">
+      <span class="label" id="servesLbl">Serves</span>
+      <div class="stepper" role="group" aria-labelledby="servesLbl">
+        <button type="button" id="less" aria-label="Fewer serves">−</button>
+        <output id="serves" aria-live="polite">2</output>
+        <button type="button" id="more" aria-label="More serves">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipe-body">
+    <section class="docket-wrap" aria-labelledby="docketTitle">
+      <div class="docket" id="docket">
+        <div class="docket-top">
+          <p class="docket-brand">Bibimbap Builder</p>
+          <p id="docketTitle">Market list</p>
+          <p class="docket-meta"><span id="docketDate"></span><span id="docketServes"></span></p>
         </div>
-        <p class="progress" id="shopProgress"></p>
         <div id="shop"></div>
-        <textarea class="copybox" id="copybox" readonly hidden aria-label="Shopping list text"></textarea>
-      </section>
+        <div class="docket-foot">
+          <p><span>Items</span><b id="shopCount">0</b></p>
+          <p><span>In the basket</span><b id="shopGot">0</b></p>
+          <div class="barcode" aria-hidden="true"></div>
+          <p class="thanks" lang="ko">감사합니다 · thank you</p>
+        </div>
+      </div>
+      <button class="pill solid" type="button" id="copy">Copy the list</button>
+      <textarea class="copybox" id="copybox" readonly hidden aria-label="Shopping list text"></textarea>
+    </section>
 
-      <section class="pane" id="pane-method" role="tabpanel" aria-labelledby="tab-method" hidden>
-        <p class="progress" id="methodProgress"></p>
-        <ol class="steps" id="steps"></ol>
-        <p class="kicker">Bibim means mixed. Bring the bowl to the table looking neat, then stir it all together before the first bite.</p>
-      </section>
-    </aside>
-  </main>
-  <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
-</div>
+    <section class="method" aria-labelledby="methodTitle">
+      <h3 id="methodTitle">Method</h3>
+      <p class="progress" id="methodProgress"></p>
+      <ol class="steps" id="steps"></ol>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <p class="foot-hangul" lang="ko">비빔</p>
+    <p>Bibim means mixed. Bring the bowl to the table looking neat, then stir it all together before the first bite.</p>
+    <a href="#top">Back to the bowl ↑</a>
+  </footer>
+</main>
+
+<p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>
